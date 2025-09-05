@@ -12,13 +12,18 @@ resource "aws_internet_gateway" "igw" {
 }
 
 resource "aws_subnet" "public" {
-  for_each = toset(var.public_subnets)
-  vpc_id = aws_vpc.main.id
-  cidr_block = each.value
-  availability_zone = data.aws_availability_zones.available.names[0]
+  for_each = { for idx, cidr in var.public_subnets : idx => cidr }
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = each.value
+  availability_zone       = data.aws_availability_zones.available.names[tonumber(each.key)]
   map_public_ip_on_launch = true
-  tags = { Name = "${var.project_name}-public-${each.value}" }
+
+  tags = {
+    Name = "${var.project_name}-public-${each.value}"
+  }
 }
+
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
