@@ -1,0 +1,10 @@
+aws_region = "ap-south-1"
+project_name = "small-ecommerce"
+vpc_cidr = "10.0.0.0/16"
+public_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
+desired_count = 1
+min_desired_count = 1
+max_desired_count = 4
+container_port = 3000
+cpu = "256"
+memory = "512"
