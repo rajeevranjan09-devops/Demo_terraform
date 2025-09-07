@@ -11,18 +11,21 @@ resource "aws_internet_gateway" "igw" {
   tags = { Name = "${var.project_name}-igw" }
 }
 
+
 resource "aws_subnet" "public" {
-  for_each = { for idx, cidr in var.public_subnets : idx => cidr }
+    for_each = { for idx, cidr in var.public_subnets : idx => cidr }
 
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = each.value
-  availability_zone       = data.aws_availability_zones.available.names[tonumber(each.key)]
-  map_public_ip_on_launch = true
+    vpc_id = aws_vpc.main.id
+    cidr_block = each.value
+    availability_zone = data.aws_availability_zones.available.names[tonumber(each.key)]
+    map_public_ip_on_launch = true
 
-  tags = {
-    Name = "${var.project_name}-public-${each.value}"
-  }
-}
+    tags = {
+      Name = "${var.project_name}-public-${each.value}"
+    }
+ }
+
+
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
@@ -92,11 +95,11 @@ resource "aws_lb" "alb" {
 }
 
 resource "aws_lb_target_group" "tg" {
-  name        = "${var.project_name}-tg"
-  port        = var.container_port
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
-  target_type = "ip"   # 🔑 Required for ECS Fargate with awsvpc
+  name     = "${var.project_name}-tg"
+  port     = var.container_port
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+  target_type = "ip" 
 
   health_check {
     path                = "/health"
@@ -108,7 +111,6 @@ resource "aws_lb_target_group" "tg" {
 
   tags = { Name = "${var.project_name}-tg" }
 }
-
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.alb.arn
